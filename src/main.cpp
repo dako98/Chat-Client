@@ -10,16 +10,75 @@ const std::string ADDRESS("127.0.0.1");
 const std::string PORT("42123");
 int sendMessage(tcp::socket &socket, const Message &message);
 
-void chat(tcp::socket &&socket)
+enum Commands
 {
-    Message initialMessage = Message("pass1","client1", "client2");
+    INVALID = -1,
+
+    REGISTER,
+    LOGIN,
+    CHAT,
+    END,
+
+    COMMANDS_SIZE
+};
+
+int commandToCode(const std::string &command)
+{
+    static std::array<std::string, COMMANDS_SIZE> commandsResolver = {"register", "login", "chat", "end"};
+    int code = INVALID;
+
+    for (int commandCode = 0; commandCode < COMMANDS_SIZE; ++commandCode)
+    {
+        if (command == commandsResolver[commandCode])
+        {
+            code = commandCode;
+            break;
+        }
+    }
+    return code;
+}
+
+void menu(tcp::socket &&socket)
+{
+    // No authentication. Out of scope.
+
+    // Send authentication message
+    Message initialMessage = Message(std::string("pass1"), std::string("client1"), std::string("server"));
     sendMessage(socket, initialMessage);
-    
-    Message subsequent = Message("hello","client1", "client2");
+
+// TODO: for testing purpouses only:
+    Message subsequent = Message("hello", "client1", "client2");
     sendMessage(socket, subsequent);
 
-    subsequent = Message("loopback","client1", "client1");
+    subsequent = Message("loopback", "client1", "client1");
     sendMessage(socket, subsequent);
+
+
+    // While not quit chatting
+    std::string command;
+    int commandCode;
+    do
+    {
+        std::cin >> command;
+        commandCode = commandToCode(command);
+
+        switch (commandCode)
+        {
+        case CHAT:
+
+            break;
+        case END:
+
+            break;
+
+        default:
+            break;
+        }
+
+    } while (commandCode != END);
+
+    std::this_thread::sleep_for(std::chrono::seconds(100));
+
 }
 
 int sendMessage(tcp::socket &socket, const Message &message)
@@ -55,8 +114,7 @@ int main()
 
         tcp::socket socket(io_service);
 
-//                chat(std::move(socket));
-
+        //                chat(std::move(socket));
 
         for (; endpointsIterator != endpointsEnd; endpointsIterator++)
         {
@@ -67,7 +125,7 @@ int main()
             if (!e)
             {
                 std::cout << "... and connected!" << std::endl;
-                chat(std::move(socket));
+                menu(std::move(socket));
                 break;
             }
             else
