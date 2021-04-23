@@ -112,7 +112,7 @@ Message writeMessage(const std::string &clientName, const std::string &to)
 
 bool requestToChat(tcp::socket &socket, const std::string &clientName, const std::string &recipient)
 {
-    std::string name = clientName, message = recipient, receiver = "server";
+    std::string name = clientName, message = recipient, receiver = "chat";
     bool valid = true;
 
     MessageBuilder messageBuilder;
@@ -145,7 +145,7 @@ bool requestToChat(tcp::socket &socket, const std::string &clientName, const std
     }
     else
     {
-        std::cout << "Did not get response from server. Got \"" << request << "\" instead.";
+        std::cout << "Did not get response from server. Got \"" << request << "\" instead.\n";
         throw std::invalid_argument("Invalid response.");
     }
     return valid;
@@ -190,15 +190,17 @@ void chat(tcp::socket &socket, const std::string &clientName)
 
 bool login(tcp::socket &socket, std::string &loggedinName)
 {
-    std::string name, password, receiver = "server";
+    std::string name, password, receiver = "login";
     bool valid = true, successfullLogin;
 
     MessageBuilder messageBuilder;
     do
     {
         std::cout << "Ender name: ";
+        std::cin >> name;
         valid &= messageBuilder.setSender(name);
         std::cout << "Ender password: ";
+        std::cin >> password;
         valid &= messageBuilder.setMessage(password);
 
     } while (!valid);
