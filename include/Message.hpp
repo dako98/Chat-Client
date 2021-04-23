@@ -8,14 +8,12 @@
 
 #include "User.hpp"
 
-using usrType = std::string;
-
 class Message
 {
 
 public:
-    usrType getSender() const;
-    usrType getReceiver() const;
+    std::string getSender() const;
+    std::string getReceiver() const;
     std::string getContents() const;
 
     Message()
@@ -23,12 +21,13 @@ public:
     {
     }
 
-    Message(const std::string &text,
+ /*   Message(const std::string &text,
             const User &sender,
             const User &receiver)
         : receiver(receiver.getName()), sender(sender.getName()), contents(text)
     {
-    }
+    }*/
+    
     Message(const std::string &text,
             const std::string &sender,
             const std::string &receiver)
@@ -49,8 +48,8 @@ public:
 private:
 
     std::string contents;
-    usrType receiver;
-    usrType sender;
+    std::string receiver;
+    std::string sender;
 };
 
 #endif // __MESSAGE_H__
