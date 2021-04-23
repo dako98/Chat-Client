@@ -52,7 +52,7 @@ static inline int commandToCode(const std::string &command)
     return code;
 }
 
-void requestHistory(tcp::socket &socket, const std::string &clientName, const std::string& participant)
+void requestHistory(tcp::socket &socket, const std::string &clientName, const std::string &participant)
 {
     const std::string name = clientName, message = participant, receiver = "history";
 
@@ -70,7 +70,7 @@ void requestHistory(tcp::socket &socket, const std::string &clientName, const st
 
     if (request.getSender() == "server")
     {
-        if (request.getContents() == "")
+        if (request.getContents() == " ")
         {
             std::cout << "(X) Getting history error. Server responded with empty response.";
         }
@@ -133,7 +133,7 @@ bool requestToChat(tcp::socket &socket, const std::string &clientName, const std
 
     if (request.getSender() == "server")
     {
-        if (request.getContents() != "")
+        if (request.getContents() != " ")
         {
             std::cout << "(X) Login error. Server responded with: " << request.getContents() << '\n';
             valid = false;
@@ -145,7 +145,7 @@ bool requestToChat(tcp::socket &socket, const std::string &clientName, const std
     }
     else
     {
-        std::cout << "Did not get response from server. Got \"" << login << "\" instead.";
+        std::cout << "Did not get response from server. Got \"" << request << "\" instead.";
         throw std::invalid_argument("Invalid response.");
     }
     return valid;
@@ -213,7 +213,7 @@ bool login(tcp::socket &socket, std::string &loggedinName)
 
     if (login.getSender() == "server")
     {
-        if (login.getContents() != "")
+        if (login.getContents() != " ")
         {
             std::cout << "(X) Login error. Server responded with: " << login.getContents() << '\n';
             successfullLogin = false;
@@ -241,8 +241,10 @@ bool registerUser(tcp::socket &socket, std::string &registeredName)
     do
     {
         std::cout << "Ender name (max 255): ";
+        std::cin >> name;
         valid &= messageBuilder.setSender(name);
         std::cout << "Ender password (max 255): ";
+        std::cin >> password;
         valid &= messageBuilder.setMessage(password);
 
     } while (!valid);
@@ -257,7 +259,7 @@ bool registerUser(tcp::socket &socket, std::string &registeredName)
 
     if (registration.getSender() == "server")
     {
-        if (registration.getContents() != "")
+        if (registration.getContents() != " ")
         {
             std::cout << "(X) Registration error. Server responded with: " << registration.getContents() << '\n';
             successfullRegistration = false;
@@ -312,43 +314,56 @@ void menu(tcp::socket &&socket)
     int commandCode;
     do
     {
+        std::cout << "register (user, pass), login (user, pass)\n";
         std::cin >> command;
         commandCode = commandToCode(command);
 
         switch (commandCode)
         {
         case Commands::REGISTER:
+        {
             bool registrationStatus = registerUser(socket, userName);
             if (registrationStatus)
             {
                 std::cout << "Registered. Type: login <name> <password>.";
             }
+        }
 
-            break;
+        break;
         case Commands::LOGIN:
+        {
             bool loginStatus = login(socket, userName);
             if (loginStatus)
             {
                 chat(socket, userName);
             }
+        }
 
-            break;
+        break;
         case Commands::CHAT:
+        {
             // TODO: Remove
             break;
+        }
         case Commands::END:
+        {
             std::cout << "Invalid command. You are not in a chat.\n";
 
             break;
+        }
         case Commands::INVALID:
+        {
             std::cout << "Invalid command.\n";
             break;
-
-        default:
-            break;
         }
+        default:
+        {
+        }
+        break;
+        }
+    }
 
-    } while (commandCode != Commands::END);
+    while (commandCode != Commands::END);
 
     std::this_thread::sleep_for(std::chrono::seconds(100));
 }
