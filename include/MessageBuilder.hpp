@@ -8,10 +8,10 @@
 // We limit the scope of this so it doesn't leak into other classes
 //#define Socket boost::asio::ip::tcp::socket
 
-const unsigned char MAX_SIZE = 255;
 
 class MessageBuilder
 {
+static const unsigned char MAX_SIZE = 255;
 using Socket = boost::asio::ip::tcp::socket;
 public:
     MessageBuilder()
