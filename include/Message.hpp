@@ -8,6 +8,7 @@
 
 #include "User.hpp"
 
+const unsigned char MAX_SIZE = 255;
 class Message
 {
 
