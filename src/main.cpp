@@ -191,11 +191,11 @@ void chat(tcp::socket &socket, const std::string &clientName)
 bool login(tcp::socket &socket, std::string &loggedinName)
 {
     std::string name, password, receiver = "login";
-    bool valid = true, successfullLogin;
+    bool valid = true, successfullLogin = false;
 
     MessageBuilder messageBuilder;
     do
-    {
+    {        valid = true;
         std::cout << "Ender name: ";
         std::cin >> name;
         valid &= messageBuilder.setSender(name);
@@ -222,7 +222,7 @@ bool login(tcp::socket &socket, std::string &loggedinName)
         }
         else
         {
-            userName = loggedinName;
+            loggedinName = name;
             successfullLogin = true;
         }
     }
@@ -282,35 +282,6 @@ bool registerUser(tcp::socket &socket, std::string &registeredName)
 
 void menu(tcp::socket &&socket)
 {
-    // No authentication. Out of scope.
-
-    // Send authentication message
-    /*    Message initialMessage = Message(std::string("pass2"), std::string("client2"), std::string("server"));
-    sendMessage(socket, initialMessage);
-*/
-    // TODO: for testing purpouses only:
-    /*    Message subsequent = Message("hello", "client1", "client2");
-    sendMessage(socket, subsequent);
-
-    subsequent = Message("loopback", "client1", "client1");
-    sendMessage(socket, subsequent);
-*/
-
-    /*    Message initialMessage = Message(password, userName, receiver);
-    sendMessage(socket, initialMessage);
-
-    initialMessage = Message(message, userName, receiver);
-    sendMessage(socket, initialMessage);
-
-    Message receivedMessage;
-    receiveMessage(socket, receivedMessage);
-
-
-#ifdef debug
-    std::cout << receivedMessage << '\n';
-#endif
-*/
-
     // While invalid
     std::string command;
     int commandCode;
@@ -337,6 +308,7 @@ void menu(tcp::socket &&socket)
             bool loginStatus = login(socket, userName);
             if (loginStatus)
             {
+                std::cout << "Logged in as " << userName << ". Starting chat...\n";
                 chat(socket, userName);
             }
         }
@@ -408,8 +380,8 @@ boost::system::error_code &messageReceiverV2(tcp::socket &socket, Message &messa
 
 int main()
 {
-    std::cout << "Username, password, receiver, message\n";
-    std::cin >> userName >> password >> receiver >> message;
+//    std::cout << "Username, password, receiver, message\n";
+//    std::cin >> userName >> password >> receiver >> message;
 
     try
     {
