@@ -39,6 +39,10 @@ boost::system::error_code MessageBuilder::setReceiver(Socket &socket)
         readLength += socket.read_some(boost::asio::buffer(rBuffer, 1), error);
     readLength = 0;
 
+// testing
+ //   readLength += socket.async_read_some(boost::asio::buffer(rBuffer));
+    // !testing
+
     size = rBuffer[0];
 
     int receiverLen = size;
