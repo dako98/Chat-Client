@@ -60,7 +60,6 @@ static inline int commandToCode(const std::string &command)
     return code;
 }
 
-
 Message writeMessage(const std::string &clientName, const std::string &to)
 {
     std::string text;
@@ -68,6 +67,7 @@ Message writeMessage(const std::string &clientName, const std::string &to)
 
     do
     {
+        // FIXME: use getline to get whole line, not just first word.
         std::cin >> text;
     } while (text.length() < 1 ||
              text.length() > MAX_SIZE);
@@ -79,9 +79,6 @@ Message writeMessage(const std::string &clientName, const std::string &to)
 
     return builder.build();
 }
-
-
-
 
 // read from the async message queue and transfer to vector
 std::vector<Message> receiveAsyncMessagesFromQueue(ThreadSafeQueue<Message> &messageQueue)
@@ -116,48 +113,43 @@ void chat(tcp::socket &socket, const std::string &clientName)
     {
         // receive chat history
         requestHistory(socket, clientName, recipient);
-    }
 
-    std::cout << "Use \"end\" to quit chat." << std::endl;
+        std::cout << "Use \"end\" to quit chat." << std::endl;
 
-    Message sessionMessage;
+        Message sessionMessage;
+        ThreadSafeQueue<Message> messageQueue;
 
-    ThreadSafeQueue<Message> messageQueue;
+        auto readThread = std::thread(startAsyncReceiver, std::ref(socket), std::ref(messageQueue));
 
-    //    startAsyncReceiver(socket, messageQueue);
-
-    auto readThread = std::thread(startAsyncReceiver,  std::ref(socket), std::ref(messageQueue));
-
-    while (allowedToChat)
-    {
-        // receive session message
-        //FIXME: Use the variant that has a timeout
-        // TODO: Spawn a thread that listens for new messages and
-        // pushes then to the queue. Add a thread sleep for better loops.
-        //        receiveMessage(socket, sessionMessage);
-
-        printMessages(
-            receiveAsyncMessagesFromQueue(messageQueue));
-
-        // display message
-//        std::cout << sessionMessage << '\n';
-
-        // write message
-        sessionMessage = writeMessage(clientName, recipient);
-
-        if (sessionMessage.getContents() == "end")
+        while (allowedToChat)
         {
-            allowedToChat = false;
-            break;
-        }
+            // Print messages from async queue.
+            printMessages(
+                receiveAsyncMessagesFromQueue(messageQueue));
 
-        // send message
-        sendMessage(socket, sessionMessage);
-    } // send/receive loop
+            // write message
+            sessionMessage = writeMessage(clientName, recipient);
 
-    readThread.join();
+            if (sessionMessage.getContents() != "end")
+            {
+                // send message
+                sendMessage(socket, sessionMessage);
+            }
+            else
+            {
+                allowedToChat = false;
+                break;
+            }
+
+        } // send/receive loop
+
+        readThread.join();
+    }
+    else
+    {
+        std::cout << "Chat denied by server.\n";
+    }
 }
-
 
 void menu(tcp::socket &&socket)
 {
