@@ -16,17 +16,6 @@ using boost::asio::ip::tcp;
 const std::string ADDRESS("127.0.0.1");
 const std::string PORT("42123");
 
-/*
-std::string userName;
-std::string password;
-std::string receiver;
-std::string message;
-*/
-
-int sendMessage(tcp::socket &socket, const Message &message);
-int receiveMessage(tcp::socket &socket, Message &message);
-boost::system::error_code messageReceiverV2(tcp::socket &socket, Message &message);
-
 enum Commands
 {
     INVALID = -1,
@@ -101,6 +90,21 @@ void printMessages(const std::vector<Message> &messages)
     }
 }
 
+void receiveOnline(tcp::socket &socket)
+{
+    Message response;
+    receiveMessage(socket, response);
+
+    std::string onlineUsers;
+    int count = atoi(response.getContents().c_str());
+    for (size_t i = 0; i < count; i++)
+    {
+        receiveMessage(socket, response);
+        onlineUsers += response.getContents() + " ";
+    }
+    std::cout << onlineUsers << std::endl;
+}
+
 void chat(tcp::socket &socket, const std::string &clientName)
 {
     std::string recipient;
@@ -124,8 +128,8 @@ void chat(tcp::socket &socket, const std::string &clientName)
         while (allowedToChat)
         {
             // Print messages from async queue.
-            printMessages(
-                receiveAsyncMessagesFromQueue(messageQueue));
+            //            printMessages(
+            //               receiveAsyncMessagesFromQueue(messageQueue));
 
             // write message
             sessionMessage = writeMessage(clientName, recipient);
@@ -180,7 +184,9 @@ void menu(tcp::socket &&socket)
             bool loginStatus = login(socket, userName);
             if (loginStatus)
             {
-                std::cout << "Logged in as " << userName << ". Starting chat...\n";
+                std::cout << "Logged in as " << userName << ". Online users: ";
+                receiveOnline(socket);
+                //TODO: receive message with online users and print it
                 chat(socket, userName);
             }
         }
@@ -207,11 +213,12 @@ void menu(tcp::socket &&socket)
         }
         break;
         }
-    }
+    } while (commandCode != Commands::END);
 
-    while (commandCode != Commands::END);
-
+#ifdef debug
+    std::cout << "Exiting in 100s." << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(100));
+#endif
 }
 
 int main()
