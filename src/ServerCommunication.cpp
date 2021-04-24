@@ -47,6 +47,8 @@ void startAsyncReceiver(tcp::socket &socket, ThreadSafeQueue<Message> &messageQu
         receiveMessage(socket, receivedMessage);
         messageQueue.waitAndPush(receivedMessage);
 
+        std::cout << receivedMessage << '\n';
+
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
