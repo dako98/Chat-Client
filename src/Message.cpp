@@ -31,5 +31,5 @@ std::ostream &operator<<(std::ostream &out, const Message &obj)
     return out
            << "Message { Sender: " << (obj.sender)
            << " receiver: " << (obj.receiver)
-           << " contents: " << (obj.contents) << " }\n";
+           << " contents: " << (obj.contents) << " }";
 }
