@@ -1,7 +1,6 @@
 #ifndef __USER_H__
 #define __USER_H__
 
-#define debug
 
 #include <string>
 #include <iostream>
@@ -44,8 +43,8 @@ namespace std
     {
         size_t operator()(const User &x) const
         {
-            return 1;
-//            return hash<std::string>()(x.getName());
+//            return 1;
+            return hash<std::string>()(x.getName());
         }
     };
 }
