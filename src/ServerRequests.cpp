@@ -140,10 +140,10 @@ bool registerUser(tcp::socket &socket, std::string &registeredName)
     MessageBuilder messageBuilder;
     do
     {
-        std::cout << "Ender name (max 255): ";
+        std::cout << "Ender name (max " << std::to_string(Message::MAX_FIELD_SIZE) << "): ";
         std::cin >> name;
         valid &= messageBuilder.setSender(name);
-        std::cout << "Ender password (max 255): ";
+        std::cout << "Ender password (max " << std::to_string(Message::MAX_FIELD_SIZE) << "): ";
         std::cin >> password;
         valid &= messageBuilder.setMessage(password);
 
