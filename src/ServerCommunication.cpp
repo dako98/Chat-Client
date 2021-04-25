@@ -24,7 +24,6 @@ int receiveMessage(tcp::socket &socket, Message &message)
     messageReceiverV2(socket, message);
 }
 
-
 boost::system::error_code messageReceiverV2(tcp::socket &socket, Message &message)
 {
     boost::system::error_code error;
@@ -38,14 +37,22 @@ boost::system::error_code messageReceiverV2(tcp::socket &socket, Message &messag
     return error;
 }
 
-void startAsyncReceiver(tcp::socket &socket, ThreadSafeQueue<Message> &messageQueue)
+void startAsyncReceiver(tcp::socket &socket, ThreadSafeQueue<Message> &messageQueue, bool &keepAlive)
 {
     Message receivedMessage;
 
-    for (;;)
+    while (keepAlive)
     {
         receiveMessage(socket, receivedMessage);
         messageQueue.waitAndPush(receivedMessage);
+
+        if ((receivedMessage.getContents() == "") &&
+            (receivedMessage.getReceiver() == "") &&
+            (receivedMessage.getSender() == ""))
+        {
+            keepAlive = false;
+            break;
+        }
 
         std::cout << receivedMessage << std::endl;
 
