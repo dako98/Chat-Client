@@ -43,7 +43,6 @@ void requestHistory(tcp::socket &socket, const std::string &clientName, const st
     }
 }
 
-
 bool requestToChat(tcp::socket &socket, const std::string &clientName, const std::string &recipient)
 {
     std::string name = clientName, message = recipient, receiver = "chat";
@@ -67,24 +66,24 @@ bool requestToChat(tcp::socket &socket, const std::string &clientName, const std
 
     if (request.getSender() == "server")
     {
-        if (request.getContents() != " ")
+        if (request.getContents() == " ")
         {
-            std::cout << "(X) Login error. Server responded with: " << request.getContents() << '\n';
-            valid = false;
+            valid = true;
         }
         else
         {
-            valid = true;
+            std::cout << "(X) Chat error. Server responded with: " << request.getContents() << '\n';
+            valid = false;
         }
     }
     else
     {
         std::cout << "Did not get response from server. Got \"" << request << "\" instead.\n";
         throw std::invalid_argument("Invalid response.");
+        valid = false;
     }
     return valid;
 }
-
 
 bool login(tcp::socket &socket, std::string &loggedinName)
 {
