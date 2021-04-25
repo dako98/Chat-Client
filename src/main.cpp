@@ -125,7 +125,7 @@ void chat(tcp::socket &socket, const std::string &clientName)
         requestHistory(socket, clientName, recipient);
 
         std::cout << "Use \"/exit\" to quit chat." << std::endl;
-        std::cout << "Message (max "<<Message::MAX_FIELD_SIZE<<") \n";
+        std::cout << "Message (max " << std::to_string(Message::MAX_FIELD_SIZE) << ") \n";
 
         Message sessionMessage;
         ThreadSafeQueue<Message> messageQueue;
@@ -149,12 +149,18 @@ void chat(tcp::socket &socket, const std::string &clientName)
             }
             else
             {
+                MessageBuilder builder;
+                builder.setReceiver(" ");
+                builder.setSender(" ");
+                builder.setMessage(" ");
+                sendMessage(socket, builder.build());
                 allowedToChat = false;
                 break;
             }
 
         } // send/receive loop
 
+// FIXME: kill program.
         readThread.join();
         std::cout << "Connection lost.\n";
     }
@@ -201,6 +207,7 @@ void menu(tcp::socket &&socket)
                 std::cout << "Logged in as " << userName << ". Online users: ";
                 receiveOnline(socket);
                 chat(socket, userName);
+                commandCode = Commands::END;
             }
             else
             {
