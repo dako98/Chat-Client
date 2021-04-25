@@ -15,6 +15,7 @@ using boost::asio::ip::tcp;
 
 const std::string ADDRESS("127.0.0.1");
 const std::string PORT("42123");
+const unsigned char MAX_MESSAGE_SIZE = 255;
 
 enum Commands
 {
@@ -51,16 +52,21 @@ static inline int commandToCode(const std::string &command)
 
 Message writeMessage(const std::string &clientName, const std::string &to)
 {
+    //    std::cout << "Message (max 255): ";
     std::string text;
-    std::cout << "Message (max 255): ";
 
+    //    char buffer[MAX_MESSAGE_SIZE + 1] = {'\0',};
+    int read;
     do
     {
+        std::getline(std::cin, text);
         // FIXME: use getline to get whole line, not just first word.
-        std::cin >> text;
-    } while (text.length() < 1 ||
-             text.length() > MAX_SIZE);
+        //        std::cin.getline(text, MAX_MESSAGE_SIZE);
+        read = text.length();
+    } while (read < 1 ||
+             read > MAX_MESSAGE_SIZE-1);
 
+    //    text = buffer;
     MessageBuilder builder;
     builder.setMessage(text);
     builder.setReceiver(to);
@@ -118,12 +124,14 @@ void chat(tcp::socket &socket, const std::string &clientName)
         // receive chat history
         requestHistory(socket, clientName, recipient);
 
-        std::cout << "Use \"end\" to quit chat." << std::endl;
+        std::cout << "Use \"/exit\" to quit chat." << std::endl;
+        std::cout << "Message (max 255) \n";
 
         Message sessionMessage;
         ThreadSafeQueue<Message> messageQueue;
 
-        auto readThread = std::thread(startAsyncReceiver, std::ref(socket), std::ref(messageQueue));
+        auto readThread = std::thread(startAsyncReceiver, std::ref(socket),
+                                      std::ref(messageQueue), std::ref(allowedToChat));
 
         while (allowedToChat)
         {
@@ -134,7 +142,7 @@ void chat(tcp::socket &socket, const std::string &clientName)
             // write message
             sessionMessage = writeMessage(clientName, recipient);
 
-            if (sessionMessage.getContents() != "end")
+            if (sessionMessage.getContents() != "/exit")
             {
                 // send message
                 sendMessage(socket, sessionMessage);
@@ -148,6 +156,7 @@ void chat(tcp::socket &socket, const std::string &clientName)
         } // send/receive loop
 
         readThread.join();
+        std::cout << "Connection lost.\n";
     }
     else
     {
@@ -186,7 +195,6 @@ void menu(tcp::socket &&socket)
             {
                 std::cout << "Logged in as " << userName << ". Online users: ";
                 receiveOnline(socket);
-                //TODO: receive message with online users and print it
                 chat(socket, userName);
             }
         }
