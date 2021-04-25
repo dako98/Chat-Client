@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Message.hpp"
 
-
 Message::~Message()
 {
 #ifdef debug
@@ -28,8 +27,14 @@ std::string Message::getContents() const
 }
 std::ostream &operator<<(std::ostream &out, const Message &obj)
 {
-    return out
-           << "Message { Sender: " << (obj.sender)
-           << " receiver: " << (obj.receiver)
-           << " contents: " << (obj.contents) << " }";
+#ifdef debug
+    out << "Message { Sender: " << (obj.sender)
+        << " receiver: " << (obj.receiver)
+        << " contents: " << (obj.contents) << " }";
+#endif
+#ifndef debug
+    out << "[ " << obj.sender << " -> " << obj.receiver << " ]: " << obj.contents;
+#endif
+
+    return out;
 }
