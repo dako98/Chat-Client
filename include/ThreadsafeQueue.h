@@ -36,7 +36,7 @@ public:
 
     bool empty() const
     {
-        return this->size() > 0;
+        return this->size() == 0;
     }
 
 private:
