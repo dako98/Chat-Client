@@ -101,7 +101,7 @@ boost::system::error_code MessageBuilder::setAll(Socket &socket)
 bool MessageBuilder::setSender(const std::string &sender)
 {
     bool valid = false;
-    if (sender.length() < MAX_SIZE)
+    if (sender.length() < Message::MAX_FIELD_SIZE)
     {
         this->sender = sender;
         valid = true;
@@ -111,7 +111,7 @@ bool MessageBuilder::setSender(const std::string &sender)
 bool MessageBuilder::setReceiver(const std::string &receiver)
 {
     bool valid = false;
-    if (receiver.length() < MAX_SIZE)
+    if (receiver.length() < Message::MAX_FIELD_SIZE)
     {
         this->receiver = receiver;
         valid = true;
@@ -121,7 +121,7 @@ bool MessageBuilder::setReceiver(const std::string &receiver)
 bool MessageBuilder::setMessage(const std::string &message)
 {
     bool valid = false;
-    if (message.length() < MAX_SIZE)
+    if (message.length() < Message::MAX_FIELD_SIZE)
     {
         this->message = message;
         valid = true;

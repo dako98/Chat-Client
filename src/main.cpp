@@ -15,7 +15,7 @@ using boost::asio::ip::tcp;
 
 const std::string ADDRESS("127.0.0.1");
 const std::string PORT("42123");
-const unsigned char MAX_MESSAGE_SIZE = 255;
+//const unsigned char MAX_MESSAGE_SIZE = 255;
 
 enum Commands
 {
@@ -64,7 +64,7 @@ Message writeMessage(const std::string &clientName, const std::string &to)
         //        std::cin.getline(text, MAX_MESSAGE_SIZE);
         read = text.length();
     } while (read < 1 ||
-             read > MAX_MESSAGE_SIZE - 1);
+             read > Message::MAX_FIELD_SIZE - 1);
 
     //    text = buffer;
     MessageBuilder builder;
@@ -125,7 +125,7 @@ void chat(tcp::socket &socket, const std::string &clientName)
         requestHistory(socket, clientName, recipient);
 
         std::cout << "Use \"/exit\" to quit chat." << std::endl;
-        std::cout << "Message (max 255) \n";
+        std::cout << "Message (max "<<Message::MAX_FIELD_SIZE<<") \n";
 
         Message sessionMessage;
         ThreadSafeQueue<Message> messageQueue;
