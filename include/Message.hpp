@@ -1,15 +1,14 @@
 #ifndef __MESSAGE_H__
 #define __MESSAGE_H__
 
-
 #include <string>
 #include <memory>
 
 #include "User.hpp"
 
-const unsigned char MAX_SIZE = 255;
 class Message
 {
+
 
 public:
     std::string getSender() const;
@@ -21,20 +20,20 @@ public:
     {
     }
 
- /*   Message(const std::string &text,
+    /*   Message(const std::string &text,
             const User &sender,
             const User &receiver)
         : receiver(receiver.getName()), sender(sender.getName()), contents(text)
     {
     }*/
-    
+
     Message(const std::string &text,
             const std::string &sender,
             const std::string &receiver)
         : receiver(receiver), sender(sender), contents(text)
     {
     }
-    Message(const Message& other)
+    Message(const Message &other)
     {
         this->contents = other.contents;
         this->receiver = other.receiver;
@@ -45,8 +44,9 @@ public:
 
     ~Message();
 
-private:
+    static const unsigned int MAX_FIELD_SIZE = 255;
 
+private:
     std::string contents;
     std::string receiver;
     std::string sender;
