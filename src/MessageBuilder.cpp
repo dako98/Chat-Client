@@ -8,7 +8,7 @@ boost::system::error_code MessageBuilder::setSender(Socket &socket)
     boost::system::error_code error;
     int readLength = 0;
 
-    char size;
+    unsigned char size;
 
     while (readLength < 1 && !error)
         readLength += socket.read_some(boost::asio::buffer(rBuffer, 1), error);
@@ -33,15 +33,12 @@ boost::system::error_code MessageBuilder::setReceiver(Socket &socket)
 
     int readLength = 0;
 
-    char size;
+    unsigned char size;
 
     while (readLength < 1 && !error)
         readLength += socket.read_some(boost::asio::buffer(rBuffer, 1), error);
     readLength = 0;
 
-// testing
- //   readLength += socket.async_read_some(boost::asio::buffer(rBuffer));
-    // !testing
 
     size = rBuffer[0];
 
@@ -61,7 +58,7 @@ boost::system::error_code MessageBuilder::setMessage(Socket &socket)
     boost::system::error_code error;
     int readLength = 0;
 
-    char size;
+    unsigned char size;
 
     while (readLength < 1 && !error)
         readLength += socket.read_some(boost::asio::buffer(rBuffer, 1), error);
