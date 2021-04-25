@@ -46,9 +46,10 @@ void startAsyncReceiver(tcp::socket &socket, ThreadSafeQueue<Message> &messageQu
         receiveMessage(socket, receivedMessage);
         messageQueue.waitAndPush(receivedMessage);
 
-        if ((receivedMessage.getContents() == "") &&
-            (receivedMessage.getReceiver() == "") &&
-            (receivedMessage.getSender() == ""))
+        if (((receivedMessage.getContents() == "") &&
+             (receivedMessage.getReceiver() == "") &&
+             (receivedMessage.getSender() == "")) ||
+            !keepAlive)
         {
             keepAlive = false;
             break;
