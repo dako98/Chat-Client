@@ -64,7 +64,7 @@ Message writeMessage(const std::string &clientName, const std::string &to)
         //        std::cin.getline(text, MAX_MESSAGE_SIZE);
         read = text.length();
     } while (read < 1 ||
-             read > MAX_MESSAGE_SIZE-1);
+             read > MAX_MESSAGE_SIZE - 1);
 
     //    text = buffer;
     MessageBuilder builder;
@@ -185,6 +185,11 @@ void menu(tcp::socket &&socket)
             {
                 std::cout << "Registered. Type: login <name> <password>.\n";
             }
+            else
+            {
+                std::cout << "Connection refused.";
+                return;
+            }
         }
 
         break;
@@ -196,6 +201,11 @@ void menu(tcp::socket &&socket)
                 std::cout << "Logged in as " << userName << ". Online users: ";
                 receiveOnline(socket);
                 chat(socket, userName);
+            }
+            else
+            {
+                std::cout << "Connection refused.";
+                return;
             }
         }
 
